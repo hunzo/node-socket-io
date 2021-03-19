@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import 'https://fonts.googleapis.com/css?family=Kanit|Prompt';
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            margin-bottom: 2em;
+        }
+
+        #messages > li {
+            padding: 0.5rem, 1rem;
+            font-family: 'Kanit', sans-serif;
+            font-size: 14;
+        }
+
+        #messages > li:nth-child(odd) {
+            background: #efefef;
+        }
+
+        #session {
+            font-family: 'Kanit', sans-serif;
+            color: red;
+            font-weight: 2em;
+            
+        }
+
+        div {
+            font-family: 'Kanit', sans-serif;
+        }        
+
+    </style>
+</head>
+<body>
+    <div >user session: <span id="session"></span></div>
+    <hr>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+        <input id="input" autocomplete="off" /><button>Send</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io()
+
+        var form = document.getElementById('form')
+        var input = document.getElementById('input')
+        var user_session = uuidv4()
+
+        document.getElementById("session").innerHTML = user_session
+        
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+
+            let payload = {
+                message: input.value,
+                username: user_session
+            }
+            if(input.value) {
+                socket.emit('chat message', payload)
+                input.value = ''
+            }
+
+        })
+
+        socket.on('chat message', (msg) => {
+            console.log(msg.username)
+            var item = document.createElement('li')
+            item.innerHTML = msg.username.bold() + '  :   ' + msg.message
+            messages.appendChild(item)
+            window.scrollTo(0, document.body.scrollHeight)
+        })
+        function uuidv4() {
+            // return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            return 'xxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+}
+
+    </script>   
+</body>
+</html>
